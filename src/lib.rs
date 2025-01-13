@@ -187,12 +187,18 @@ impl SchemaSniffer {
                 }
             }
             
+            println!("\nInferring types for path: {}", path);
             let mut types: Vec<_> = counts.keys()
-                .map(|v| Self::infer_field_type(v))
+                .map(|v| {
+                    let t = Self::infer_field_type(v);
+                    println!("Value: {:?} -> Type: {}", v, t);
+                    t
+                })
                 .collect::<std::collections::HashSet<_>>()
                 .into_iter()
                 .collect();
             types.sort();
+            println!("Final types for {}: {:?}", path, types);
             
             if types.len() == 1 {
                 current["type"] = json!(types[0]);
