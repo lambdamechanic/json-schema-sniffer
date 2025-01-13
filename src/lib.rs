@@ -110,11 +110,11 @@ impl SchemaSniffer {
     }
 }
 
-pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<jsonschema::Validator, jsonschema::ValidationError<'static>> {
+pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<(jsonschema::Validator, Value), jsonschema::ValidationError<'static>> {
     let mut sniffer = SchemaSniffer::new();
     for value in values {
         sniffer.add_value(&value);
     }
     let schema = sniffer.infer_schema();
-    jsonschema::validator_for(&schema)
+    Ok((jsonschema::validator_for(&schema)?, schema))
 }
