@@ -201,9 +201,9 @@ fn main() {
 
     println!("\nTesting invalid eye color (flashing):");
     if validator.is_valid(&invalid_test_value) {
-        println!("Test value matches inferred schema!");
+        println!("Invalid test value matches inferred schema: failure!");
     } else {
-        println!("Test value does NOT match inferred schema:");
+        println!("Invalid test value does NOT match inferred schema: success!");
         for error in validator.iter_errors(&invalid_test_value) {
             println!("- {}", error);
         }
