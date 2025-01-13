@@ -61,7 +61,7 @@ impl SchemaSniffer {
                 current = &mut current[part];
             }
             
-            let types: Vec<&str> = counts.keys()
+            let mut types = counts.keys()
                 .map(|v| match v {
                     Value::Null => "null",
                     Value::Bool(_) => "boolean",
@@ -69,11 +69,17 @@ impl SchemaSniffer {
                     Value::String(_) => "string",
                     _ => "object",
                 })
-                .collect();
+                .collect::<std::collections::HashSet<&str>>()
+                .into_iter()
+                .collect::<Vec<&str>>();
             
+            // Sort types for consistent output
+            types.sort();
+            
+            // JSON Schema requires type to be either a string or array of strings
             if types.len() == 1 {
                 current["type"] = json!(types[0]);
-            } else {
+            } else if types.len() > 1 {
                 current["type"] = json!(types);
             }
             

@@ -15,7 +15,13 @@ fn main() {
         }),
     ];
 
-    let validator = validate_with_inferred_schema(values).unwrap();
+    let validator = match validate_with_inferred_schema(values) {
+        Ok(v) => v,
+        Err(e) => {
+            eprintln!("Failed to create validator: {}", e);
+            std::process::exit(1);
+        }
+    };
     
     let test_value = json!({
         "name": "Charlie",
