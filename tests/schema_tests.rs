@@ -317,6 +317,9 @@ fn test_gimli_validation() {
         "name": "Gimli",
         "class": "Fighter",
         "level": 12,
+        "metadata": {
+            "campaign": "The Fellowship"
+        },
         "stats": {
             "strength": 18,
             "dexterity": 10,
@@ -349,6 +352,9 @@ fn test_gimli_validation() {
         "name": "Gimli",
         "class": "Fighter",
         "level": "twelve", // Invalid: level should be integer
+        "metadata": {
+            "campaign": "The Fellowship"
+        },
         "stats": {
             "strength": 18,
             "dexterity": 10,
@@ -391,9 +397,8 @@ fn test_metadata_properties() {
     // Verify metadata allows additional properties
     assert_eq!(schema["properties"]["metadata"]["additionalProperties"], json!(true));
     
-    // Verify metadata has no static properties (empty properties object)
-    assert!(schema["properties"]["metadata"]["properties"].as_object().unwrap().is_empty(),
-            "Metadata should have no static properties");
+    // Verify metadata has campaign property
+    assert_eq!(schema["properties"]["metadata"]["properties"]["campaign"]["type"], "string");
 }
 
 #[test]
