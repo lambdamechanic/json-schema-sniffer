@@ -120,10 +120,8 @@ impl SchemaSniffer {
                 if let Some(props) = obj.get_mut("properties").and_then(|v| v.as_object_mut()) {
                     props.retain(|key, _| static_keys.contains(key));
                 }
-                obj.insert("additionalProperties".to_string(), json!(true));
-            } else {
-                obj.insert("additionalProperties".to_string(), json!(false));
             }
+            obj.insert("additionalProperties".to_string(), json!(has_dynamic_keys));
         }
     }
 
