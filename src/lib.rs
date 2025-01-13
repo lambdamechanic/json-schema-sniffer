@@ -42,7 +42,15 @@ impl SchemaSniffer {
     }
 
     pub fn infer_schema(&self) -> Value {
-        let mut schema = json!({});
+        let mut schema = json!({
+            "$schema": "https://json-schema.org/draft/2020-12/schema",
+            "$id": "https://example.com/my-schema",
+            "type": "object",
+            "$defs": {},
+            "properties": {}
+        });
+        
+        let mut enum_defs = HashMap::new();
         
         for (path, counts) in &self.value_counts {
             let mut current = &mut schema;
@@ -106,10 +114,26 @@ impl SchemaSniffer {
                     let enum_values: Vec<&Value> = counts.keys()
                         .filter(|v| v.is_string())
                         .collect();
-                    println!("Creating enum with values: {:?}", enum_values);
-                    current["enum"] = json!(enum_values);
+                    
+                    // Create a unique enum name based on the path
+                    let enum_name = format!("{}Enum", path.replace('.', "_").replace('[', "").replace(']', ""));
+                    println!("Creating enum {} with values: {:?}", enum_name, enum_values);
+                    
+                    // Store the enum definition
+                    enum_defs.insert(enum_name.clone(), json!({
+                        "type": "string",
+                        "enum": enum_values
+                    }));
+                    
+                    // Use $ref instead of inline enum
+                    current["$ref"] = json!(format!("#/$defs/{}", enum_name));
                 }
             }
+        }
+        
+        // Add all enum definitions to $defs
+        if !enum_defs.is_empty() {
+            schema["$defs"] = json!(enum_defs);
         }
         
         schema
