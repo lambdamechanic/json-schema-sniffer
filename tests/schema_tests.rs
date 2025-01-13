@@ -367,6 +367,65 @@ fn test_gimli_validation() {
 }
 
 #[test]
+fn test_dynamic_vs_static_objects() {
+    let values = vec![
+        // Static object example
+        json!({
+            "stats": {
+                "strength": 10,
+                "dexterity": 12
+            }
+        }),
+        json!({
+            "stats": {
+                "strength": 15,
+                "dexterity": 14
+            }
+        }),
+        // Dynamic object example
+        json!({
+            "metadata": {
+                "favorite_color": "blue",
+                "age": 30
+            }
+        }),
+        json!({
+            "metadata": {
+                "preferred_language": "Rust",
+                "experience_years": 5
+            }
+        }),
+        json!({
+            "metadata": {
+                "hobby": "programming",
+                "coffee_cups_per_day": 3
+            }
+        })
+    ];
+
+    let (validator, schema) = validate_with_inferred_schema(values)
+        .expect("Failed to create validator");
+
+    // Print the inferred schema
+    println!("Inferred schema:\n{}", serde_json::to_string_pretty(&schema).unwrap());
+
+    // Test static object behavior
+    assert_eq!(schema["properties"]["stats"]["type"], "object");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "integer");
+    assert!(!schema["properties"]["stats"].get("additionalProperties").is_some(), 
+        "Static object should not have additionalProperties");
+
+    // Test dynamic object behavior
+    assert_eq!(schema["properties"]["metadata"]["type"], "object");
+    assert!(schema["properties"]["metadata"].get("additionalProperties").is_some(), 
+        "Dynamic object should have additionalProperties");
+    assert_eq!(schema["properties"]["metadata"]["additionalProperties"], true);
+    assert!(schema["properties"]["metadata"]["properties"].as_object().unwrap().is_empty(),
+        "Dynamic object should have empty properties");
+}
+
+#[test]
 fn test_schema_structure() {
     let values = get_basic_test_values();
 
