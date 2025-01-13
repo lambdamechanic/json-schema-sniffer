@@ -136,8 +136,39 @@ impl SchemaSniffer {
                 println!("Unique object keys: {}", unique_keys);
                 println!("Key ratio: {}", total_keys as f64 / unique_keys as f64);
                 
-                // If we have many unique keys relative to total keys, treat as dynamic object
-                if unique_keys > 10 && (total_keys as f64 / unique_keys as f64) < 5.0 {
+                // Track which keys appear in all objects vs some objects
+                let mut key_consistency = HashMap::new();
+                let total_objects = counts.values().sum::<usize>();
+                
+                for (value, count) in counts {
+                    if let Value::Object(obj) = value {
+                        for key in obj.keys() {
+                            *key_consistency.entry(key.clone()).or_insert(0) += count;
+                        }
+                    }
+                }
+                
+                // Calculate what percentage of objects contain each key
+                let mut key_coverage: Vec<f64> = key_consistency.values()
+                    .map(|&c| c as f64 / total_objects as f64)
+                    .collect();
+                
+                // If most keys appear in less than 50% of objects, treat as dynamic
+                let dynamic_threshold = 0.5;
+                let dynamic_keys = key_coverage.iter()
+                    .filter(|&&c| c < dynamic_threshold)
+                    .count();
+                let dynamic_ratio = dynamic_keys as f64 / key_coverage.len() as f64;
+                
+                println!("\nField: {}", path);
+                println!("Total objects: {}", total_objects);
+                println!("Unique keys: {}", unique_keys);
+                println!("Dynamic key ratio: {:.2}", dynamic_ratio);
+                
+                // Treat as dynamic if:
+                // 1. More than 50% of keys appear in less than 50% of objects OR
+                // 2. We have many unique keys relative to total keys
+                if dynamic_ratio > 0.5 || (unique_keys > 10 && (total_keys as f64 / unique_keys as f64) < 5.0) {
                     current["additionalProperties"] = json!(true);
                     current["properties"] = json!({});
                     println!("Treating {} as dynamic object", path);
