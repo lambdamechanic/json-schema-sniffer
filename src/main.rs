@@ -13,7 +13,7 @@ fn main() {
             "name": "Bob",
             "age": 25,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Charlie",
@@ -31,7 +31,7 @@ fn main() {
             "name": "Eve",
             "age": 32,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Frank",
@@ -43,7 +43,7 @@ fn main() {
             "name": "Grace",
             "age": 22,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Heidi",
@@ -55,7 +55,7 @@ fn main() {
             "name": "Ivan",
             "age": 31,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Judy",
@@ -67,7 +67,7 @@ fn main() {
             "name": "Kevin",
             "age": 33,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Linda",
@@ -79,7 +79,7 @@ fn main() {
             "name": "Michael",
             "age": 34,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Nancy",
@@ -91,7 +91,7 @@ fn main() {
             "name": "Oscar",
             "age": 30,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         // Adding more entries to meet 10x rule
         json!({
@@ -104,7 +104,7 @@ fn main() {
             "name": "Quinn",
             "age": 27,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Rachel",
@@ -116,7 +116,7 @@ fn main() {
             "name": "Steve",
             "age": 29,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Tina",
@@ -128,7 +128,7 @@ fn main() {
             "name": "Uma",
             "age": 28,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Victor",
@@ -140,7 +140,7 @@ fn main() {
             "name": "Wendy",
             "age": 30,
             "active": false,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Xander",
@@ -152,7 +152,7 @@ fn main() {
             "name": "Yvonne",
             "age": 29,
             "active": true,
-            "eye-colour": "brown"
+            "eye-colour": "green"
         }),
         json!({
             "name": "Zack",
