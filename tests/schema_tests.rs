@@ -274,8 +274,12 @@ fn test_deeply_nested_structure() {
 
     // Check nested stats structure
     assert_eq!(schema["properties"]["stats"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "integer");
-    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "object");
+    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "object");
+    
+    // Check the nested structure
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["properties"]["base"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["properties"]["modifier"]["type"], "integer");
 
     // Check nested inventory structure
     assert_eq!(schema["properties"]["inventory"]["type"], "object");
