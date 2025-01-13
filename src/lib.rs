@@ -122,7 +122,8 @@ impl SchemaSniffer {
                 if n.is_i64() || n.is_u64() { "integer" } else { "number" }
             },
             Value::String(_) => "string",
-            _ => "object",
+            Value::Array(_) => "array",
+            Value::Object(_) => "object",
         }
     }
 
