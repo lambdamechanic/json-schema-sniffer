@@ -1,4 +1,4 @@
-use jsonschema::{Draft};
+use jsonschema::{Draft, JSONSchema};
 use serde_json::{Value, json};
 use std::collections::HashMap;
 
@@ -87,13 +87,13 @@ impl SchemaSniffer {
     }
 }
 
-pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<jsonschema::JSONSchema, jsonschema::ValidationError<'static>> {
+pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<JSONSchema, jsonschema::ValidationError<'static>> {
     let mut sniffer = SchemaSniffer::new();
     for value in values {
         sniffer.add_value(&value);
     }
     let schema = sniffer.infer_schema();
-    JSONSchema::options()
+    jsonschema::JSONSchema::options()
         .with_draft(Draft::Draft7)
         .compile(&schema)
 }
