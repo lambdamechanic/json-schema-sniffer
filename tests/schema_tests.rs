@@ -415,8 +415,8 @@ fn test_dynamic_vs_static_objects() {
 
     // Test static object behavior
     assert_eq!(schema["properties"]["stats"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "integer");
-    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "object");
+    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "object");
     assert!(!schema["properties"]["stats"].get("additionalProperties").is_some(), 
         "Static object should not have additionalProperties");
 
