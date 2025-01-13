@@ -115,6 +115,35 @@ impl SchemaSniffer {
                 current["type"] = json!(types);
             }
             
+            // Handle object key patterns
+            if types.contains(&"object") {
+                // Track unique keys seen in objects at this path
+                let mut key_counts = HashMap::new();
+                
+                for (value, count) in counts {
+                    if let Value::Object(obj) = value {
+                        for key in obj.keys() {
+                            *key_counts.entry(key.clone()).or_insert(0) += count;
+                        }
+                    }
+                }
+                
+                let total_keys: usize = key_counts.values().sum();
+                let unique_keys = key_counts.len();
+                
+                println!("\nField: {}", path);
+                println!("Total object keys: {}", total_keys);
+                println!("Unique object keys: {}", unique_keys);
+                println!("Key ratio: {}", total_keys as f64 / unique_keys as f64);
+                
+                // If we have many unique keys relative to total keys, treat as dynamic object
+                if unique_keys > 10 && (total_keys as f64 / unique_keys as f64) < 5.0 {
+                    current["additionalProperties"] = json!(true);
+                    current["properties"] = json!({});
+                    println!("Treating {} as dynamic object", path);
+                }
+            }
+            
             // Handle enum cases only for strings with limited unique values
             if types.contains(&"string") {
                 let unique_strings = counts.keys()
