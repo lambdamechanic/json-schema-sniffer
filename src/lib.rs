@@ -7,9 +7,9 @@ pub struct SchemaSniffer {
 }
 
 impl SchemaSniffer {
-    /// Determines if an object should be treated as having dynamic properties
-    /// based on its observed values
-    pub fn is_dynamic_object(values: &HashMap<Value, usize>) -> bool {
+    /// Analyzes an object's properties to determine which are static (present in all objects)
+    /// versus dynamic (varying between objects)
+    pub fn analyze_object_properties(values: &HashMap<Value, usize>) -> (bool, Vec<String>) {
         let mut key_consistency = HashMap::new();
         let total_objects = values.values().sum::<usize>();
         
@@ -22,13 +22,17 @@ impl SchemaSniffer {
             }
         }
         
-        // Calculate what percentage of objects contain each key
-        let key_coverage: Vec<f64> = key_consistency.values()
-            .map(|&c| c as f64 / total_objects as f64)
+        // Find keys that appear in 100% of objects
+        let static_keys: Vec<String> = key_consistency.iter()
+            .filter(|(_, &count)| (count as f64 / total_objects as f64) >= 1.0)
+            .map(|(key, _)| key.clone())
             .collect();
-        
-        // If any keys appear in less than 100% of objects, treat as dynamic
-        key_coverage.iter().any(|&coverage| coverage < 1.0)
+            
+        // Object is dynamic if any keys appear in less than 100% of objects
+        let has_dynamic_keys = key_consistency.values()
+            .any(|&count| (count as f64 / total_objects as f64) < 1.0);
+            
+        (has_dynamic_keys, static_keys)
     }
 
     pub fn new() -> Self {
@@ -160,12 +164,16 @@ impl SchemaSniffer {
                 println!("Unique object keys: {}", unique_keys);
                 println!("Key ratio: {}", total_keys as f64 / unique_keys as f64);
                 
-                let is_dynamic = Self::is_dynamic_object(counts);
+                let (has_dynamic_keys, static_keys) = Self::analyze_object_properties(counts);
                 
-                if is_dynamic {
-                    // For dynamic objects, clear any detected properties and set additionalProperties
+                if has_dynamic_keys {
+                    // For dynamic objects, keep static properties and allow additional ones
                     if let Some(obj) = current.as_object_mut() {
-                        obj.remove("properties");
+                        // Keep only the properties that appear in all objects
+                        if let Some(props) = obj.get_mut("properties").and_then(|v| v.as_object_mut()) {
+                            props.retain(|key, _| static_keys.contains(key));
+                        }
+                        // Allow additional properties
                         obj.insert("additionalProperties".to_string(), json!(true));
                     }
                 }

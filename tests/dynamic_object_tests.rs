@@ -62,6 +62,8 @@ fn test_mixed_keys_object_detection() {
         1
     );
 
-    assert!(SchemaSniffer::is_dynamic_object(&values),
-        "Object with mixed keys should be dynamic");
+    let (has_dynamic_keys, static_keys) = SchemaSniffer::analyze_object_properties(&values);
+    assert!(has_dynamic_keys, "Object with mixed keys should be dynamic");
+    assert!(static_keys.contains("common"), "Should identify 'common' as static key");
+    assert!(!static_keys.contains("only_first"), "Should not identify 'only_first' as static key");
 }
