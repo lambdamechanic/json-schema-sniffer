@@ -167,10 +167,11 @@ impl SchemaSniffer {
                 
                 // Treat as dynamic if:
                 // 1. More than 50% of keys appear in less than 50% of objects OR
-                // 2. Keys vary significantly between objects
-                if dynamic_ratio > 0.5 || key_consistency.len() != key_counts.len() {
+                // 2. Keys vary significantly between objects OR
+                // 3. Not all objects have the same keys
+                if dynamic_ratio > 0.5 || key_consistency.len() != key_counts.len() || 
+                   key_coverage.iter().any(|&coverage| coverage < 1.0) {
                     current["additionalProperties"] = json!(true);
-                    current["properties"] = json!({});
                     println!("Treating {} as dynamic object", path);
                 }
             }
