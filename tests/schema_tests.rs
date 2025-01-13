@@ -383,7 +383,7 @@ fn test_metadata_properties() {
         .expect("Failed to create validator");
 
     println!("\nFull schema for metadata:");
-    println!("{}", serde_json::to_string_pretty(&schema["properties"]["metadata"]).unwrap());
+    println!("{}", serde_json::to_string_pretty(&schema).unwrap());
 
     // Check that metadata exists and is an object
     assert_eq!(schema["properties"]["metadata"]["type"], "object");
