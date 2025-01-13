@@ -1,4 +1,4 @@
-use json_schema_sniffer::{validate_with_inferred_schema, SchemaSniffer};
+use json_schema_sniffer::validate_with_inferred_schema;
 use serde_json::json;
 
 fn main() {

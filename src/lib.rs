@@ -1,4 +1,3 @@
-use jsonschema::Draft;
 use serde_json::{Value, json};
 use std::collections::HashMap;
 
