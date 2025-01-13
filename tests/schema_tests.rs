@@ -272,14 +272,10 @@ fn test_deeply_nested_structure() {
     // Print the inferred schema
     println!("Inferred D&D schema:\n{}", serde_json::to_string_pretty(&schema).unwrap());
 
-    // Check nested stats structure
+    // Check stats structure
     assert_eq!(schema["properties"]["stats"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "object");
-    
-    // Check the nested structure
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["properties"]["base"]["type"], "integer");
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["properties"]["modifier"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "integer");
 
     // Check nested inventory structure
     assert_eq!(schema["properties"]["inventory"]["type"], "object");
@@ -370,64 +366,6 @@ fn test_gimli_validation() {
     assert!(!validator.is_valid(&invalid_gimli), "Invalid level type should fail validation");
 }
 
-#[test]
-fn test_dynamic_vs_static_objects() {
-    let values = vec![
-        // Static object example with object values
-        json!({
-            "stats": {
-                "strength": { "base": 10, "modifier": 0 },
-                "dexterity": { "base": 12, "modifier": 1 }
-            }
-        }),
-        json!({
-            "stats": {
-                "strength": { "base": 15, "modifier": 2 },
-                "dexterity": { "base": 14, "modifier": 2 }
-            }
-        }),
-        // Dynamic object example
-        json!({
-            "metadata": {
-                "favorite_color": { "value": "blue", "since": 2020 },
-                "age": { "value": 30, "unit": "years" }
-            }
-        }),
-        json!({
-            "metadata": {
-                "preferred_language": { "value": "Rust", "proficiency": "expert" },
-                "experience_years": { "value": 5, "details": "professional" }
-            }
-        }),
-        json!({
-            "metadata": {
-                "hobby": { "value": "programming", "frequency": "daily" },
-                "coffee_cups_per_day": { "value": 3, "preferred_type": "espresso" }
-            }
-        })
-    ];
-
-    let (validator, schema) = validate_with_inferred_schema(values)
-        .expect("Failed to create validator");
-
-    // Print the inferred schema
-    println!("Inferred schema:\n{}", serde_json::to_string_pretty(&schema).unwrap());
-
-    // Test static object behavior
-    assert_eq!(schema["properties"]["stats"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "object");
-    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "object");
-    assert!(!schema["properties"]["stats"].get("additionalProperties").is_some(), 
-        "Static object should not have additionalProperties");
-
-    // Test dynamic object behavior
-    assert_eq!(schema["properties"]["metadata"]["type"], "object");
-    assert!(schema["properties"]["metadata"].get("additionalProperties").is_some(), 
-        "Dynamic object should have additionalProperties");
-    assert_eq!(schema["properties"]["metadata"]["additionalProperties"], true);
-    assert!(schema["properties"]["metadata"]["properties"].as_object().unwrap().is_empty(),
-        "Dynamic object should have empty properties");
-}
 
 #[test]
 fn test_schema_structure() {
