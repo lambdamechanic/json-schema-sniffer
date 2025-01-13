@@ -2,7 +2,7 @@ use json_schema_sniffer::validate_with_inferred_schema;
 use serde_json::json;
 
 fn get_test_values() -> Vec<serde_json::Value> {
-    vec![
+    let mut values = vec![
         json!({
             "name": "Alice",
             "age": 30,
@@ -159,7 +159,72 @@ fn get_test_values() -> Vec<serde_json::Value> {
             "active": false,
             "eye-colour": "blue"
         }),
-    ]
+    ];
+
+    // Add D&D character sheets
+    values.extend(vec![
+        json!({
+            "name": "Gandalf",
+            "class": "Wizard",
+            "level": 20,
+            "stats": {
+                "strength": 10,
+                "dexterity": 12,
+                "constitution": 14,
+                "intelligence": 20,
+                "wisdom": 18,
+                "charisma": 16
+            },
+            "inventory": {
+                "weapons": [
+                    {"name": "Staff", "damage": "1d6", "type": "bludgeoning"},
+                    {"name": "Glamdring", "damage": "2d6", "type": "slashing"}
+                ],
+                "armor": [
+                    {"name": "Robe", "ac": 10},
+                    {"name": "Cloak of Protection", "ac": 12}
+                ],
+                "misc": {
+                    "potions": 3,
+                    "scrolls": 5,
+                    "gold": 150
+                }
+            },
+            "spells": [
+                {"name": "Fireball", "level": 3, "school": "Evocation"},
+                {"name": "Mage Armor", "level": 1, "school": "Abjuration"}
+            ]
+        }),
+        json!({
+            "name": "Aragorn",
+            "class": "Ranger",
+            "level": 15,
+            "stats": {
+                "strength": 18,
+                "dexterity": 16,
+                "constitution": 16,
+                "intelligence": 14,
+                "wisdom": 14,
+                "charisma": 12
+            },
+            "inventory": {
+                "weapons": [
+                    {"name": "Andúril", "damage": "2d6", "type": "slashing"}
+                ],
+                "armor": [
+                    {"name": "Chainmail", "ac": 16}
+                ],
+                "misc": {
+                    "potions": 1,
+                    "scrolls": 0,
+                    "gold": 50
+                }
+            },
+            "spells": []
+        })
+    ]);
+
+    values
 }
 
 #[test]
@@ -197,6 +262,36 @@ fn test_schema_inference() {
     
     assert!(errors.iter().any(|e| e.contains("blue")), "Error should mention 'blue'");
     assert!(errors.iter().any(|e| e.contains("green")), "Error should mention 'green'");
+}
+
+#[test]
+fn test_deeply_nested_structure() {
+    let values = get_test_values();
+    let (_, schema) = validate_with_inferred_schema(values)
+        .expect("Failed to create validator");
+
+    // Check nested stats structure
+    assert_eq!(schema["properties"]["stats"]["type"], "object");
+    assert_eq!(schema["properties"]["stats"]["properties"]["strength"]["type"], "integer");
+    assert_eq!(schema["properties"]["stats"]["properties"]["dexterity"]["type"], "integer");
+
+    // Check nested inventory structure
+    assert_eq!(schema["properties"]["inventory"]["type"], "object");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["weapons"]["type"], "array");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["weapons"]["items"]["type"], "object");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["weapons"]["items"]["properties"]["name"]["type"], "string");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["weapons"]["items"]["properties"]["damage"]["type"], "string");
+
+    // Check deeply nested misc items
+    assert_eq!(schema["properties"]["inventory"]["properties"]["misc"]["type"], "object");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["misc"]["properties"]["potions"]["type"], "integer");
+    assert_eq!(schema["properties"]["inventory"]["properties"]["misc"]["properties"]["gold"]["type"], "integer");
+
+    // Check spells array structure
+    assert_eq!(schema["properties"]["spells"]["type"], "array");
+    assert_eq!(schema["properties"]["spells"]["items"]["type"], "object");
+    assert_eq!(schema["properties"]["spells"]["items"]["properties"]["name"]["type"], "string");
+    assert_eq!(schema["properties"]["spells"]["items"]["properties"]["level"]["type"], "integer");
 }
 
 #[test]
