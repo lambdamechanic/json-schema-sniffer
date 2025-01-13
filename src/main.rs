@@ -93,6 +93,73 @@ fn main() {
             "active": true,
             "eye-colour": "brown"
         }),
+        // Adding more entries to meet 10x rule
+        json!({
+            "name": "Paul",
+            "age": 38,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Quinn",
+            "age": 27,
+            "active": false,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Rachel",
+            "age": 31,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Steve",
+            "age": 29,
+            "active": true,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Tina",
+            "age": 33,
+            "active": false,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Uma",
+            "age": 28,
+            "active": true,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Victor",
+            "age": 35,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Wendy",
+            "age": 30,
+            "active": false,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Xander",
+            "age": 32,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Yvonne",
+            "age": 29,
+            "active": true,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Zack",
+            "age": 31,
+            "active": false,
+            "eye-colour": "blue"
+        }),
     ];
 
     let (validator, schema) = match validate_with_inferred_schema(values) {
