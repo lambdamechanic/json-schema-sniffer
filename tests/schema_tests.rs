@@ -402,6 +402,21 @@ fn test_metadata_properties() {
 }
 
 #[test]
+fn test_dnd_character_validation() {
+    let values = get_dnd_test_values();
+    let (validator, _) = validate_with_inferred_schema(values)
+        .expect("Failed to create validator");
+
+    // Get both test characters
+    let aragorn = &get_dnd_test_values()[1];
+    let gandalf = &get_dnd_test_values()[0];
+
+    // Validate both characters
+    assert!(validator.is_valid(aragorn), "Aragorn should validate against schema");
+    assert!(validator.is_valid(gandalf), "Gandalf should validate against schema");
+}
+
+#[test]
 fn test_schema_structure() {
     let values = get_basic_test_values();
 
