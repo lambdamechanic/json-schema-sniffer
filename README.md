@@ -24,7 +24,7 @@ json-schema-sniffer = "0.1"
 ### Basic Example
 
 ```rust
-use json_schema_sniffer::{SchemaSniffer, validate_with_inferred_schema};
+use json_schema_sniffer::validate_with_inferred_schema;
 use serde_json::json;
 
 let values = vec![
@@ -32,7 +32,7 @@ let values = vec![
     json!({"name": "Bob", "age": 25, "active": false}),
 ];
 
-let (validator, schema) = validate_with_inferred_schema(values)?;
+let (validator, _schema) = validate_with_inferred_schema(values).unwrap();
 
 // Validate new data
 let test_value = json!({"name": "Charlie", "age": 35, "active": true});
@@ -44,13 +44,16 @@ assert!(validator.is_valid(&test_value));
 The sniffer automatically detects string enums:
 
 ```rust
+use json_schema_sniffer::validate_with_inferred_schema;
+use serde_json::json;
+
 let values = vec![
     json!({"status": "active"}),
     json!({"status": "inactive"}),
     json!({"status": "pending"}),
 ];
 
-let (validator, schema) = validate_with_inferred_schema(values)?;
+let (validator, _schema) = validate_with_inferred_schema(values).unwrap();
 
 // Will fail validation
 let invalid = json!({"status": "unknown"});
@@ -62,6 +65,9 @@ assert!(!validator.is_valid(&invalid));
 Handles complex nested objects and arrays:
 
 ```rust
+use json_schema_sniffer::validate_with_inferred_schema;
+use serde_json::json;
+
 let values = vec![
     json!({
         "name": "Alice",
@@ -81,7 +87,7 @@ let values = vec![
     })
 ];
 
-let (validator, schema) = validate_with_inferred_schema(values)?;
+let (validator, _schema) = validate_with_inferred_schema(values).unwrap();
 ```
 
 ### Dynamic Properties
@@ -89,6 +95,9 @@ let (validator, schema) = validate_with_inferred_schema(values)?;
 Supports objects with varying properties:
 
 ```rust
+use json_schema_sniffer::validate_with_inferred_schema;
+use serde_json::json;
+
 let values = vec![
     json!({
         "type": "user",
@@ -102,7 +111,7 @@ let values = vec![
     })
 ];
 
-let (validator, schema) = validate_with_inferred_schema(values)?;
+let (validator, _schema) = validate_with_inferred_schema(values).unwrap();
 ```
 
 ## API

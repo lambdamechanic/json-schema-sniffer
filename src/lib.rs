@@ -1,3 +1,7 @@
+#[doc = include_str!("../README.md")]
+#[cfg(doctest)]
+pub struct ReadmeDoctests;
+
 use serde_json::{Value, json};
 use std::collections::{HashMap, BinaryHeap};
 use std::cmp::Ordering;
