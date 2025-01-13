@@ -72,10 +72,12 @@ impl SchemaSniffer {
     }
 
     fn accumulate_counts(&mut self, path: &str, value: &Value) {
-        // Track this node regardless of its type
-        let counts = self.value_counts.entry(path.to_string())
-            .or_insert_with(HashMap::new);
-        *counts.entry(value.clone()).or_insert(0) += 1;
+        // Only track non-root paths
+        if !path.is_empty() {
+            let counts = self.value_counts.entry(path.to_string())
+                .or_insert_with(HashMap::new);
+            *counts.entry(value.clone()).or_insert(0) += 1;
+        }
 
         // Recurse into child nodes
         match value {
