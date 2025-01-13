@@ -297,6 +297,76 @@ fn test_deeply_nested_structure() {
 }
 
 #[test]
+fn test_gimli_validation() {
+    let values = get_dnd_test_values();
+    let (validator, _) = validate_with_inferred_schema(values)
+        .expect("Failed to create validator");
+
+    // Create Gimli's character data
+    let gimli = json!({
+        "name": "Gimli",
+        "class": "Fighter",
+        "level": 12,
+        "stats": {
+            "strength": 18,
+            "dexterity": 10,
+            "constitution": 16,
+            "intelligence": 10,
+            "wisdom": 12,
+            "charisma": 8
+        },
+        "inventory": {
+            "weapons": [
+                {"name": "Battle Axe", "damage": "1d10", "type": "slashing"}
+            ],
+            "armor": [
+                {"name": "Chainmail", "ac": 16}
+            ],
+            "misc": {
+                "potions": 2,
+                "scrolls": 0,
+                "gold": 75
+            }
+        },
+        "spells": []
+    });
+
+    // Validate Gimli against the schema
+    assert!(validator.is_valid(&gimli), "Gimli's character data should validate against the schema");
+
+    // Test invalid data
+    let invalid_gimli = json!({
+        "name": "Gimli",
+        "class": "Fighter",
+        "level": "twelve", // Invalid: level should be integer
+        "stats": {
+            "strength": 18,
+            "dexterity": 10,
+            "constitution": 16,
+            "intelligence": 10,
+            "wisdom": 12,
+            "charisma": 8
+        },
+        "inventory": {
+            "weapons": [
+                {"name": "Battle Axe", "damage": "1d10", "type": "slashing"}
+            ],
+            "armor": [
+                {"name": "Chainmail", "ac": 16}
+            ],
+            "misc": {
+                "potions": 2,
+                "scrolls": 0,
+                "gold": 75
+            }
+        },
+        "spells": []
+    });
+
+    assert!(!validator.is_valid(&invalid_gimli), "Invalid level type should fail validation");
+}
+
+#[test]
 fn test_schema_structure() {
     let values = get_basic_test_values();
 
