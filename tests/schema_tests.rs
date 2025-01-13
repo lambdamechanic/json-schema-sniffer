@@ -1,8 +1,8 @@
 use json_schema_sniffer::validate_with_inferred_schema;
 use serde_json::json;
 
-fn get_test_values() -> Vec<serde_json::Value> {
-    let mut values = vec![
+fn get_basic_test_values() -> Vec<serde_json::Value> {
+    vec![
         json!({
             "name": "Alice",
             "age": 30,
@@ -159,10 +159,11 @@ fn get_test_values() -> Vec<serde_json::Value> {
             "active": false,
             "eye-colour": "blue"
         }),
-    ];
+    ]
+}
 
-    // Add D&D character sheets
-    values.extend(vec![
+fn get_dnd_test_values() -> Vec<serde_json::Value> {
+    vec![
         json!({
             "name": "Gandalf",
             "class": "Wizard",
@@ -222,14 +223,12 @@ fn get_test_values() -> Vec<serde_json::Value> {
             },
             "spells": []
         })
-    ]);
-
-    values
+    ]
 }
 
 #[test]
 fn test_schema_inference() {
-    let values = get_test_values();
+    let values = get_basic_test_values();
 
     let (validator, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
@@ -266,7 +265,7 @@ fn test_schema_inference() {
 
 #[test]
 fn test_deeply_nested_structure() {
-    let values = get_test_values();
+    let values = get_dnd_test_values();
     let (_, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
 
@@ -296,7 +295,7 @@ fn test_deeply_nested_structure() {
 
 #[test]
 fn test_schema_structure() {
-    let values = get_test_values();
+    let values = get_basic_test_values();
 
     let (_, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
