@@ -9,7 +9,7 @@ pub struct SchemaSniffer {
 impl SchemaSniffer {
     /// Determines if an object should be treated as having dynamic properties
     /// based on its observed values
-    fn is_dynamic_object(values: &HashMap<Value, usize>) -> bool {
+    pub fn is_dynamic_object(values: &HashMap<Value, usize>) -> bool {
         let mut key_consistency = HashMap::new();
         let total_objects = values.values().sum::<usize>();
         
