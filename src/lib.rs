@@ -1,5 +1,5 @@
-use jsonschema::{JSONSchema, Draft};
-use serde_json::Value;
+use jsonschema::{Draft};
+use serde_json::{Value, json};
 use std::collections::HashMap;
 
 #[derive(Debug, Default)]
@@ -43,19 +43,22 @@ impl SchemaSniffer {
     }
 
     pub fn infer_schema(&self) -> Value {
-        let mut schema = serde_json::json!({});
+        let mut schema = json!({});
         
         for (path, counts) in &self.value_counts {
             let mut current = &mut schema;
             let parts: Vec<&str> = path.split('.').collect();
             
             for part in parts {
-                current = current.entry("properties")
-                    .or_insert_with(|| json!({}))
-                    .as_object_mut()
-                    .unwrap()
-                    .entry(part)
-                    .or_insert_with(|| json!({}));
+                if !current["properties"].is_object() {
+                    current["properties"] = json!({});
+                }
+                current = &mut current["properties"];
+                
+                if !current[part].is_object() {
+                    current[part] = json!({});
+                }
+                current = &mut current[part];
             }
             
             let types: Vec<&str> = counts.keys()
@@ -84,7 +87,7 @@ impl SchemaSniffer {
     }
 }
 
-pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<JSONSchema, jsonschema::ValidationError> {
+pub fn validate_with_inferred_schema(values: Vec<Value>) -> Result<jsonschema::JSONSchema, jsonschema::ValidationError<'static>> {
     let mut sniffer = SchemaSniffer::new();
     for value in values {
         sniffer.add_value(&value);
