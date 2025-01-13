@@ -39,26 +39,6 @@ let test_value = json!({"name": "Charlie", "age": 35, "active": true});
 assert!(validator.is_valid(&test_value));
 ```
 
-### Handling Enums
-
-The sniffer automatically detects string enums:
-
-```rust
-use json_schema_sniffer::validate_with_inferred_schema;
-use serde_json::json;
-
-let values = vec![
-    json!({"status": "active"}),
-    json!({"status": "inactive"}),
-    json!({"status": "pending"}),
-];
-
-let (validator, _schema) = validate_with_inferred_schema(values).unwrap();
-
-// Will fail validation
-let invalid = json!({"status": "unknown"});
-assert!(!validator.is_valid(&invalid));
-```
 
 ### Nested Structures
 
