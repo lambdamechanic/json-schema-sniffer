@@ -1,5 +1,5 @@
 use json_schema_sniffer::SchemaSniffer;
-use serde_json::{json, Value};
+use serde_json::json;
 use std::collections::HashMap;
 
 #[test]
@@ -20,8 +20,8 @@ fn test_static_object_detection() {
         1
     );
 
-    assert!(!SchemaSniffer::is_dynamic_object(&values),
-        "Object with consistent keys should not be dynamic");
+    let (has_dynamic_keys, _) = SchemaSniffer::analyze_object_properties(&values);
+    assert!(!has_dynamic_keys, "Object with consistent keys should not be dynamic");
 }
 
 #[test]
@@ -40,8 +40,8 @@ fn test_dynamic_object_detection() {
         1
     );
 
-    assert!(SchemaSniffer::is_dynamic_object(&values),
-        "Object with different keys should be dynamic");
+    let (has_dynamic_keys, _) = SchemaSniffer::analyze_object_properties(&values);
+    assert!(has_dynamic_keys, "Object with different keys should be dynamic");
 }
 
 #[test]
@@ -64,6 +64,6 @@ fn test_mixed_keys_object_detection() {
 
     let (has_dynamic_keys, static_keys) = SchemaSniffer::analyze_object_properties(&values);
     assert!(has_dynamic_keys, "Object with mixed keys should be dynamic");
-    assert!(static_keys.contains("common"), "Should identify 'common' as static key");
-    assert!(!static_keys.contains("only_first"), "Should not identify 'only_first' as static key");
+    assert!(static_keys.iter().any(|k| k == "common"), "Should identify 'common' as static key");
+    assert!(!static_keys.iter().any(|k| k == "only_first"), "Should not identify 'only_first' as static key");
 }
