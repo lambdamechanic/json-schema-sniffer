@@ -166,8 +166,13 @@ fn get_dnd_test_values() -> Vec<serde_json::Value> {
     vec![
         json!({
             "name": "Gandalf",
-            "class": "Wizard",
+            "class": "Wizard", 
             "level": 20,
+            "metadata": {
+                "campaign": "The Fellowship",
+                "player": "Ian McKellen",
+                "created_at": "2024-01-01"
+            },
             "stats": {
                 "strength": 10,
                 "dexterity": 12,
@@ -200,6 +205,11 @@ fn get_dnd_test_values() -> Vec<serde_json::Value> {
             "name": "Aragorn",
             "class": "Ranger",
             "level": 15,
+            "metadata": {
+                "campaign": "The Fellowship",
+                "last_played": "2024-01-10",
+                "notes": "Heir of Isildur"
+            },
             "stats": {
                 "strength": 18,
                 "dexterity": 16,
@@ -366,6 +376,22 @@ fn test_gimli_validation() {
     assert!(!validator.is_valid(&invalid_gimli), "Invalid level type should fail validation");
 }
 
+#[test]
+fn test_metadata_properties() {
+    let values = get_dnd_test_values();
+    let (_, schema) = validate_with_inferred_schema(values)
+        .expect("Failed to create validator");
+
+    // Check that metadata exists and is an object
+    assert_eq!(schema["properties"]["metadata"]["type"], "object");
+    
+    // Verify metadata allows additional properties
+    assert_eq!(schema["properties"]["metadata"]["additionalProperties"], json!(true));
+    
+    // Verify metadata has no static properties (empty properties object)
+    assert!(schema["properties"]["metadata"]["properties"].as_object().unwrap().is_empty(),
+            "Metadata should have no static properties");
+}
 
 #[test]
 fn test_schema_structure() {
