@@ -113,7 +113,10 @@ impl SchemaSniffer {
         println!("Unique object keys: {}", unique_keys);
         println!("Key ratio: {}", total_keys as f64 / unique_keys as f64);
         
+        println!("\nAnalyzing object properties for field: {}", path);
         let (has_dynamic_keys, static_keys) = Self::analyze_object_properties(counts);
+        println!("Dynamic keys detected: {}", has_dynamic_keys);
+        println!("Static keys: {:?}", static_keys);
         
         if let Some(obj) = current.as_object_mut() {
             if has_dynamic_keys {
@@ -131,10 +134,6 @@ impl SchemaSniffer {
             .filter(|v| v.is_string())
             .count();
         
-        println!("\nField: {}", path);
-        println!("Total values: {}", total_values);
-        println!("Unique strings: {}", unique_strings);
-        println!("10x rule: {}", total_values >= unique_strings * 10);
         
         if unique_strings < 100 && total_values >= unique_strings * 10 {
             let enum_values: Vec<&Value> = counts.keys()
