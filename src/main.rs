@@ -105,17 +105,39 @@ fn main() {
     
     println!("Inferred schema:\n{}", serde_json::to_string_pretty(&schema).unwrap());
     
+    // Test with valid eye color
     let test_value = json!({
         "name": "Charlie",
         "age": 35,
-        "active": true
+        "active": true,
+        "eye-colour": "blue"
     });
+
+    println!("\nTesting valid eye color (blue):");
 
     if validator.is_valid(&test_value) {
         println!("Test value matches inferred schema!");
     } else {
         println!("Test value does NOT match inferred schema:");
         for error in validator.iter_errors(&test_value) {
+            println!("- {}", error);
+        }
+    }
+
+    // Test with invalid eye color
+    let invalid_test_value = json!({
+        "name": "Charlie",
+        "age": 35,
+        "active": true,
+        "eye-colour": "flashing"
+    });
+
+    println!("\nTesting invalid eye color (flashing):");
+    if validator.is_valid(&invalid_test_value) {
+        println!("Test value matches inferred schema!");
+    } else {
+        println!("Test value does NOT match inferred schema:");
+        for error in validator.iter_errors(&invalid_test_value) {
             println!("- {}", error);
         }
     }

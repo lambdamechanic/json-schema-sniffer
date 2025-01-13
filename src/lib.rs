@@ -97,10 +97,16 @@ impl SchemaSniffer {
                 // Only create enum if:
                 // 1. Less than 100 unique strings AND
                 // 2. At least 10x as many entries as unique strings
+                println!("\nField: {}", path);
+                println!("Total values: {}", total_values);
+                println!("Unique strings: {}", unique_strings);
+                println!("10x rule: {}", total_values >= unique_strings * 10);
+                
                 if unique_strings < 100 && total_values >= unique_strings * 10 {
                     let enum_values: Vec<&Value> = counts.keys()
                         .filter(|v| v.is_string())
                         .collect();
+                    println!("Creating enum with values: {:?}", enum_values);
                     current["enum"] = json!(enum_values);
                 }
             }
