@@ -115,12 +115,14 @@ impl SchemaSniffer {
         
         let (has_dynamic_keys, static_keys) = Self::analyze_object_properties(counts);
         
-        if has_dynamic_keys {
-            if let Some(obj) = current.as_object_mut() {
+        if let Some(obj) = current.as_object_mut() {
+            if has_dynamic_keys {
                 if let Some(props) = obj.get_mut("properties").and_then(|v| v.as_object_mut()) {
                     props.retain(|key, _| static_keys.contains(key));
                 }
                 obj.insert("additionalProperties".to_string(), json!(true));
+            } else {
+                obj.insert("additionalProperties".to_string(), json!(false));
             }
         }
     }
