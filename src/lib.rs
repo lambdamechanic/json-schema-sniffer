@@ -153,25 +153,20 @@ impl SchemaSniffer {
                     .map(|&c| c as f64 / total_objects as f64)
                     .collect();
                 
-                // If most keys appear in less than 50% of objects, treat as dynamic
-                let dynamic_threshold = 0.5;
-                let dynamic_keys = key_coverage.iter()
-                    .filter(|&&c| c < dynamic_threshold)
-                    .count();
-                let dynamic_ratio = dynamic_keys as f64 / key_coverage.len() as f64;
+                // If any keys appear in less than 100% of objects, treat as dynamic
+                let is_dynamic = key_coverage.iter().any(|&coverage| coverage < 1.0);
                 
                 println!("\nField: {}", path);
                 println!("Total objects: {}", total_objects);
                 println!("Unique keys: {}", unique_keys);
-                println!("Dynamic key ratio: {:.2}", dynamic_ratio);
+                println!("Is dynamic: {}", is_dynamic);
                 
-                // Treat as dynamic if:
-                // 1. More than 50% of keys appear in less than 50% of objects OR
-                // 2. Keys vary significantly between objects OR
-                // 3. Not all objects have the same keys
-                if dynamic_ratio > 0.5 || key_consistency.len() != key_counts.len() || 
-                   key_coverage.iter().any(|&coverage| coverage < 1.0) {
-                    current["additionalProperties"] = json!(true);
+                if is_dynamic {
+                    // For dynamic objects, clear any detected properties and set additionalProperties
+                    if let Some(obj) = current.as_object_mut() {
+                        obj.remove("properties");
+                        obj.insert("additionalProperties".to_string(), json!(true));
+                    }
                     println!("Treating {} as dynamic object", path);
                 }
             }
