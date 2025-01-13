@@ -1,168 +1,170 @@
 use json_schema_sniffer::validate_with_inferred_schema;
 use serde_json::json;
 
-const TEST_VALUES: &[serde_json::Value] = &[
-    json!({
-        "name": "Alice",
-        "age": 30,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Bob",
-        "age": 25,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Charlie",
-        "age": 35,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Diana",
-        "age": 28,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Eve",
-        "age": 32,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Frank",
-        "age": 40,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Grace",
-        "age": 22,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Heidi",
-        "age": 29,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Ivan",
-        "age": 31,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Judy",
-        "age": 27,
-        "active": false,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Kevin",
-        "age": 33,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Linda",
-        "age": 26,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Michael",
-        "age": 34,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Nancy",
-        "age": 29,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Oscar",
-        "age": 30,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Paul",
-        "age": 38,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Quinn",
-        "age": 27,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Rachel",
-        "age": 31,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Steve",
-        "age": 29,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Tina",
-        "age": 33,
-        "active": false,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Uma",
-        "age": 28,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Victor",
-        "age": 35,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Wendy",
-        "age": 30,
-        "active": false,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Xander",
-        "age": 32,
-        "active": true,
-        "eye-colour": "blue"
-    }),
-    json!({
-        "name": "Yvonne",
-        "age": 29,
-        "active": true,
-        "eye-colour": "green"
-    }),
-    json!({
-        "name": "Zack",
-        "age": 31,
-        "active": false,
-        "eye-colour": "blue"
-    }),
-];
+fn get_test_values() -> Vec<serde_json::Value> {
+    vec![
+        json!({
+            "name": "Alice",
+            "age": 30,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Bob",
+            "age": 25,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Charlie",
+            "age": 35,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Diana",
+            "age": 28,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Eve",
+            "age": 32,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Frank",
+            "age": 40,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Grace",
+            "age": 22,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Heidi",
+            "age": 29,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Ivan",
+            "age": 31,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Judy",
+            "age": 27,
+            "active": false,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Kevin",
+            "age": 33,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Linda",
+            "age": 26,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Michael",
+            "age": 34,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Nancy",
+            "age": 29,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Oscar",
+            "age": 30,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Paul",
+            "age": 38,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Quinn",
+            "age": 27,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Rachel",
+            "age": 31,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Steve",
+            "age": 29,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Tina",
+            "age": 33,
+            "active": false,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Uma",
+            "age": 28,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Victor",
+            "age": 35,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Wendy",
+            "age": 30,
+            "active": false,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Xander",
+            "age": 32,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Yvonne",
+            "age": 29,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Zack",
+            "age": 31,
+            "active": false,
+            "eye-colour": "blue"
+        }),
+    ]
+}
 
 #[test]
 fn test_schema_inference() {
-    let values = TEST_VALUES.to_vec();
+    let values = get_test_values();
 
     let (validator, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
@@ -199,7 +201,7 @@ fn test_schema_inference() {
 
 #[test]
 fn test_schema_structure() {
-    let values = TEST_VALUES.to_vec();
+    let values = get_test_values();
 
     let (_, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
