@@ -28,9 +28,12 @@ impl SchemaSniffer {
                 }
             }
             Value::Array(arr) => {
-                for (i, val) in arr.iter().enumerate() {
-                    let new_path = format!("{}[{}]", path, i);
-                    self.accumulate_counts(&new_path, val);
+                if !arr.is_empty() {
+                    // Use [] to indicate array items rather than specific indices
+                    let new_path = format!("{}[]", path);
+                    for val in arr {
+                        self.accumulate_counts(&new_path, val);
+                    }
                 }
             }
             _ => {
@@ -62,10 +65,22 @@ impl SchemaSniffer {
                 }
                 current = &mut current["properties"];
                 
-                if !current[part].is_object() {
-                    current[part] = json!({});
+                // Handle array notation
+                if part.ends_with("[]") {
+                    let base_part = part.trim_end_matches("[]");
+                    if !current[base_part].is_object() {
+                        current[base_part] = json!({
+                            "type": "array",
+                            "items": {}
+                        });
+                    }
+                    current = &mut current[base_part]["items"];
+                } else {
+                    if !current[part].is_object() {
+                        current[part] = json!({});
+                    }
+                    current = &mut current[part];
                 }
-                current = &mut current[part];
             }
             
             // Calculate total occurrences for this path
