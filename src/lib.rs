@@ -71,13 +71,17 @@ impl SchemaSniffer {
                     if !current[base_part].is_object() {
                         current[base_part] = json!({
                             "type": "array",
-                            "items": {}
+                            "items": {
+                                "type": "object"
+                            }
                         });
                     }
                     current = &mut current[base_part]["items"];
                 } else {
                     if !current[part].is_object() {
-                        current[part] = json!({});
+                        current[part] = json!({
+                            "type": "object"
+                        });
                     }
                     current = &mut current[part];
                 }
