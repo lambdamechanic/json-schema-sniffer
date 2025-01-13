@@ -1,5 +1,33 @@
 use serde_json::{Value, json};
-use std::collections::HashMap;
+use std::collections::{HashMap, BinaryHeap};
+use std::cmp::Ordering;
+
+#[derive(Debug)]
+struct SchemaWorkItem {
+    path: String,
+    depth: usize,
+    counts: HashMap<Value, usize>,
+}
+
+impl PartialEq for SchemaWorkItem {
+    fn eq(&self, other: &Self) -> bool {
+        self.depth == other.depth
+    }
+}
+
+impl Eq for SchemaWorkItem {}
+
+impl PartialOrd for SchemaWorkItem {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for SchemaWorkItem {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.depth.cmp(&other.depth)
+    }
+}
 
 #[derive(Debug, Default)]
 pub struct SchemaSniffer {
@@ -94,39 +122,6 @@ impl SchemaSniffer {
         }
     }
 
-    fn handle_object_properties(&self, current: &mut Value, counts: &HashMap<Value, usize>, path: &str) {
-        let mut key_counts = HashMap::new();
-        
-        for (value, count) in counts {
-            if let Value::Object(obj) = value {
-                for key in obj.keys() {
-                    *key_counts.entry(key.clone()).or_insert(0) += count;
-                }
-            }
-        }
-        
-        let total_keys: usize = key_counts.values().sum();
-        let unique_keys = key_counts.len();
-        
-        println!("\nField: {}", path);
-        println!("Total object keys: {}", total_keys);
-        println!("Unique object keys: {}", unique_keys);
-        println!("Key ratio: {}", total_keys as f64 / unique_keys as f64);
-        
-        println!("\nAnalyzing object properties for field: {}", path);
-        let (has_dynamic_keys, static_keys) = Self::analyze_object_properties(counts);
-        println!("Dynamic keys detected: {}", has_dynamic_keys);
-        println!("Static keys: {:?}", static_keys);
-        
-        if let Some(obj) = current.as_object_mut() {
-            if has_dynamic_keys {
-                if let Some(props) = obj.get_mut("properties").and_then(|v| v.as_object_mut()) {
-                    props.retain(|key, _| static_keys.contains(key));
-                }
-            }
-            obj.insert("additionalProperties".to_string(), json!(has_dynamic_keys));
-        }
-    }
 
     fn handle_string_enums(&self, current: &mut Value, counts: &HashMap<Value, usize>, path: &str, enum_defs: &mut HashMap<String, Value>) {
         let total_values: usize = counts.values().sum();
@@ -156,11 +151,28 @@ impl SchemaSniffer {
         let mut schema = Self::infer_basic_schema();
         let mut enum_defs = HashMap::new();
         
-        for (path, counts) in &self.value_counts {
+        // Create a max-heap of work items sorted by path depth (longest first)
+        let mut work_queue: BinaryHeap<SchemaWorkItem> = self.value_counts.iter()
+            .map(|(path, counts)| {
+                let depth = path.matches('.').count();
+                SchemaWorkItem {
+                    path: path.clone(),
+                    depth,
+                    counts: counts.clone(),
+                }
+            })
+            .collect();
+        
+        // Process paths from deepest to shallowest
+        while let Some(work_item) = work_queue.pop() {
+            let path = &work_item.path;
+            let counts = &work_item.counts;
+            
             let mut current = &mut schema;
             let parts: Vec<&str> = path.split('.').collect();
             
-            for part in parts {
+            // Navigate to the correct position in the schema
+            for part in &parts {
                 if !current["properties"].is_object() {
                     current["properties"] = json!({});
                 }
@@ -187,6 +199,7 @@ impl SchemaSniffer {
                 }
             }
             
+            // Infer types for this path
             println!("\nInferring types for path: {}", path);
             let mut types: Vec<_> = counts.keys()
                 .map(|v| {
@@ -206,8 +219,29 @@ impl SchemaSniffer {
                 current["type"] = json!(types);
             }
             
+            // Handle object properties (now that we've processed all children)
             if types.contains(&"object") {
-                self.handle_object_properties(current, counts, path);
+                // Get the counts for just this level's properties
+                let mut level_counts = HashMap::new();
+                for (value, count) in counts {
+                    if let Value::Object(obj) = value {
+                        let mut level_obj = serde_json::Map::new();
+                        for (key, val) in obj {
+                            level_obj.insert(key.clone(), val.clone());
+                        }
+                        *level_counts.entry(Value::Object(level_obj)).or_insert(0) += count;
+                    }
+                }
+                
+                let (has_dynamic_keys, static_keys) = Self::analyze_object_properties(&level_counts);
+                if let Some(obj) = current.as_object_mut() {
+                    if has_dynamic_keys {
+                        if let Some(props) = obj.get_mut("properties").and_then(|v| v.as_object_mut()) {
+                            props.retain(|key, _| static_keys.contains(key));
+                        }
+                    }
+                    obj.insert("additionalProperties".to_string(), json!(has_dynamic_keys));
+                }
             }
             
             if types.contains(&"string") {
