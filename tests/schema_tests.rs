@@ -369,36 +369,36 @@ fn test_gimli_validation() {
 #[test]
 fn test_dynamic_vs_static_objects() {
     let values = vec![
-        // Static object example
+        // Static object example with object values
         json!({
             "stats": {
-                "strength": 10,
-                "dexterity": 12
+                "strength": { "base": 10, "modifier": 0 },
+                "dexterity": { "base": 12, "modifier": 1 }
             }
         }),
         json!({
             "stats": {
-                "strength": 15,
-                "dexterity": 14
+                "strength": { "base": 15, "modifier": 2 },
+                "dexterity": { "base": 14, "modifier": 2 }
             }
         }),
         // Dynamic object example
         json!({
             "metadata": {
-                "favorite_color": "blue",
-                "age": 30
+                "favorite_color": { "value": "blue", "since": 2020 },
+                "age": { "value": 30, "unit": "years" }
             }
         }),
         json!({
             "metadata": {
-                "preferred_language": "Rust",
-                "experience_years": 5
+                "preferred_language": { "value": "Rust", "proficiency": "expert" },
+                "experience_years": { "value": 5, "details": "professional" }
             }
         }),
         json!({
             "metadata": {
-                "hobby": "programming",
-                "coffee_cups_per_day": 3
+                "hobby": { "value": "programming", "frequency": "daily" },
+                "coffee_cups_per_day": { "value": 3, "preferred_type": "espresso" }
             }
         })
     ];
