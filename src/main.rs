@@ -33,6 +33,66 @@ fn main() {
             "active": false,
             "eye-colour": "brown"
         }),
+        json!({
+            "name": "Frank",
+            "age": 40,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Grace",
+            "age": 22,
+            "active": false,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Heidi",
+            "age": 29,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Ivan",
+            "age": 31,
+            "active": true,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Judy",
+            "age": 27,
+            "active": false,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Kevin",
+            "age": 33,
+            "active": true,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Linda",
+            "age": 26,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Michael",
+            "age": 34,
+            "active": false,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Nancy",
+            "age": 29,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Oscar",
+            "age": 30,
+            "active": true,
+            "eye-colour": "brown"
+        }),
     ];
 
     let (validator, schema) = match validate_with_inferred_schema(values) {
