@@ -268,6 +268,9 @@ fn test_deeply_nested_structure() {
     let values = get_dnd_test_values();
     let (_, schema) = validate_with_inferred_schema(values)
         .expect("Failed to create validator");
+    
+    // Print the inferred schema
+    println!("Inferred D&D schema:\n{}", serde_json::to_string_pretty(&schema).unwrap());
 
     // Check nested stats structure
     assert_eq!(schema["properties"]["stats"]["type"], "object");
