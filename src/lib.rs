@@ -61,11 +61,17 @@ impl SchemaSniffer {
                 current = &mut current[part];
             }
             
+            // Calculate total occurrences for this path
+            let total_values: usize = counts.values().sum();
+            
+            // Determine the type(s) for this field
             let mut types = counts.keys()
                 .map(|v| match v {
                     Value::Null => "null",
                     Value::Bool(_) => "boolean",
-                    Value::Number(_) => "number",
+                    Value::Number(n) => {
+                        if n.is_i64() || n.is_u64() { "integer" } else { "number" }
+                    },
                     Value::String(_) => "string",
                     _ => "object",
                 })
@@ -83,9 +89,21 @@ impl SchemaSniffer {
                 current["type"] = json!(types);
             }
             
-            if counts.len() <= 5 {
-                let enum_values: Vec<&Value> = counts.keys().collect();
-                current["enum"] = json!(enum_values);
+            // Handle enum cases only for strings with limited unique values
+            if types.contains(&"string") {
+                let unique_strings = counts.keys()
+                    .filter(|v| v.is_string())
+                    .count();
+                
+                // Only create enum if:
+                // 1. Less than 100 unique strings AND
+                // 2. At least 10x as many entries as unique strings
+                if unique_strings < 100 && total_values >= unique_strings * 10 {
+                    let enum_values: Vec<&Value> = counts.keys()
+                        .filter(|v| v.is_string())
+                        .collect();
+                    current["enum"] = json!(enum_values);
+                }
             }
         }
         

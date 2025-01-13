@@ -6,12 +6,32 @@ fn main() {
         json!({
             "name": "Alice",
             "age": 30,
-            "active": true
+            "active": true,
+            "eye-colour": "blue"
         }),
         json!({
             "name": "Bob",
             "age": 25,
-            "active": false
+            "active": false,
+            "eye-colour": "brown"
+        }),
+        json!({
+            "name": "Charlie",
+            "age": 35,
+            "active": true,
+            "eye-colour": "blue"
+        }),
+        json!({
+            "name": "Diana",
+            "age": 28,
+            "active": true,
+            "eye-colour": "green"
+        }),
+        json!({
+            "name": "Eve",
+            "age": 32,
+            "active": false,
+            "eye-colour": "brown"
         }),
     ];
 
